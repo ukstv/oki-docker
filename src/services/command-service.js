@@ -1,5 +1,6 @@
 const { execSync } = require('child_process');
 const { updateTmpFiles } = require('./tmp-service');
+const { logMsg, logNewline, logStdout } = require('./log-service');
 
 const __buildPerformReason = (dirtyCheck) => {
   const { trigger, fullPath } = dirtyCheck;
@@ -20,17 +21,17 @@ const performCommands = (commandsToPerform) => {
     const { command, dirtyChecks } = commandItem;
     const performReason = __buildPerformReasons(dirtyChecks);
 
-    console.log(`Running ${command}, because:\n${performReason}\n`);
+    logMsg(`Running ${command}, because:\n${performReason}\n`);
     try {
       const commandOutput = execSync(command, { encoding: 'utf8' });
-      console.log(commandOutput);
+      logStdout(commandOutput);
     } catch (error) {
-      console.log(`Failed to run ${command}`);
+      logMsg(`Failed to run ${command}`);
       throw error;
     }
 
     updateTmpFiles(dirtyChecks);
-    console.log();
+    logNewline();
   });
 };
 

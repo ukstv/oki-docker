@@ -20,7 +20,7 @@
     "npm"
   ],
   "bin": {
-    "oki": "./src/index.js"
+    "oki-docker": "./src/index.js"
   },
   "preferGlobal": true,
   "license": "MIT",

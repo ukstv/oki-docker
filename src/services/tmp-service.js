@@ -1,4 +1,5 @@
 const { exists, mkdir, readFile, writeFile } = require('./fs-service');
+const { logMsg } = require('./log-service');
 
 const buildTmpFilePath = (projectRoot, path) => {
   const tmpFilename = path.replace(`${projectRoot}/`, '').replace(/\//g, '-');
@@ -8,12 +9,12 @@ const buildTmpFilePath = (projectRoot, path) => {
 const addMissingTmpDir = (projectRoot) => {
   if (!exists(`${projectRoot}/tmp`)) {
     mkdir(`${projectRoot}/tmp`);
-    console.log(`Created ${projectRoot}/tmp`);
+    logMsg(`Created ${projectRoot}/tmp`);
   }
 
   if (!exists(`${projectRoot}/tmp/oki`)) {
     mkdir(`${projectRoot}/tmp/oki`);
-    console.log(`Created ${projectRoot}/tmp/oki`);
+    logMsg(`Created ${projectRoot}/tmp/oki`);
   }
 };
 
@@ -27,7 +28,7 @@ const addMissingTmpFiles = (projectRoot, commands) => {
       }
 
       writeFile(tmpPath, '');
-      console.log(`Created ${tmpPath} as a dump of ${fullPath}`);
+      logMsg(`Created ${tmpPath} as a dump of ${fullPath}`);
     });
   });
 };
@@ -40,7 +41,7 @@ const updateTmpFiles = (dirtyChecks) => {
     }
 
     writeFile(tmpPath, readFile(fullPath));
-    console.log(`Updated ${tmpPath} according with ${fullPath}`);
+    logMsg(`Updated ${tmpPath} according with ${fullPath}`);
   });
 };
 
