@@ -86,7 +86,7 @@ services:
       "command": "cd /app/packages/service2 && yarn build && cd -",
       "checks": [
         {
-          "src": "packages/service2/src/schema.graphql",
+          "path": "packages/service2/src/schema.graphql",
           "trigger": "diff"
         }
       ]
