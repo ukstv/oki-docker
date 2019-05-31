@@ -6,8 +6,8 @@
   "commands": [
     {
       "command": "echo 'simulate npm install'",
-      "checkNodeModules": true,
-      "checkPackageJson": true,
+      "checkRootNodeModules": true,
+      "checkRootPackageJson": true,
       "packages": [
         "test/packs/test3"
       ]

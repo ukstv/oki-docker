@@ -26,8 +26,8 @@ const __enrichCheck = (projectRoot, check) => {
   };
 };
 
-const __buildCheckForPackageJson = (projectRoot, checkPackageJson) => {
-  if (!checkPackageJson) {
+const __buildCheckForPackageJson = (projectRoot, checkRootPackageJson) => {
+  if (!checkRootPackageJson) {
     return [];
   }
 
@@ -42,8 +42,8 @@ const __buildCheckForPackageJson = (projectRoot, checkPackageJson) => {
   ];
 };
 
-const __buildCheckForNodeModules = (projectRoot, checkNodeModules) => {
-  if (!checkNodeModules) {
+const __buildCheckForNodeModules = (projectRoot, checkRootNodeModules) => {
+  if (!checkRootNodeModules) {
     return [];
   }
 
@@ -84,14 +84,14 @@ const enrichCommands = (projectRoot, commands) => {
   return commands.map((commandItem) => {
     const {
       command, packages, checks,
-      checkNodeModules, checkPackageJson,
+      checkRootNodeModules, checkRootPackageJson,
     } = commandItem;
 
     return {
       command,
       checks: [
-        ...__buildCheckForPackageJson(projectRoot, checkPackageJson),
-        ...__buildCheckForNodeModules(projectRoot, checkNodeModules),
+        ...__buildCheckForPackageJson(projectRoot, checkRootPackageJson),
+        ...__buildCheckForNodeModules(projectRoot, checkRootNodeModules),
         ...__buildChecksFromPackages(projectRoot, packages),
         ...__buildCustomChecks(projectRoot, checks),
       ],
