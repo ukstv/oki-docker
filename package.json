@@ -1,6 +1,6 @@
 {
   "name": "oki-docker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NPM packages installation in docker composed projects made easy",
   "author": "davletovalmir@gmail.com",
   "main": "src/index.js",
