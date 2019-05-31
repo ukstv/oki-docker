@@ -1,0 +1,34 @@
+{
+  "projectRoot": ".",
+  "tmpPath": "./tmp",
+  "packageNameKey": "TEST_PACKAGE_NAME",
+  "masterPackage": "test-package",
+  "commands": [
+    {
+      "command": "echo 'simulate npm install'",
+      "checkNodeModules": true,
+      "checkPackageJson": true,
+      "packages": [
+        "test/packs/test3"
+      ]
+    },
+    {
+      "command": "echo 'test custom file diff check'",
+      "checks": [
+        {
+          "path": "test/packs/test1/test.json",
+          "trigger": "diff"
+        }
+      ]
+    },
+    {
+      "command": "echo 'test custom empty dir check' && mkdir -p ./tmp/empty-dir && touch ./tmp/empty-dir/test.json",
+      "checks": [
+        {
+          "path": "tmp/empty-dir",
+          "trigger": "empty"
+        }
+      ]
+    }
+  ]
+}

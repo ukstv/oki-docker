@@ -1,0 +1,31 @@
+{
+  "name": "oki-docker",
+  "version": "1.0.0",
+  "description": "NPM packages installation in docker composed projects made easy",
+  "author": "davletovalmir@gmail.com",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "TEST_PACKAGE_NAME=test-package node src/index.js ./test/test-config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/davletovalmir/oki-docker.git"
+  },
+  "keywords": [
+    "oki",
+    "docker",
+    "docker-compose",
+    "entrypoint",
+    "node",
+    "npm"
+  ],
+  "bin": {
+    "oki": "./src/index.js"
+  },
+  "preferGlobal": true,
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davletovalmir/oki-docker/issues"
+  },
+  "homepage": "https://github.com/davletovalmir/oki-docker#readme"
+}
