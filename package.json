@@ -1,10 +1,11 @@
 {
   "name": "oki-docker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "NPM packages installation in docker composed projects made easy",
   "author": "davletovalmir@gmail.com",
-  "main": "src/index.js",
+  "main": "./dist/index.js",
   "scripts": {
+    "build": "webpack --config webpack.config.js",
     "test": "TEST_PACKAGE_NAME=test-package node src/index.js ./test/test-config.json"
   },
   "repository": {
@@ -20,12 +21,16 @@
     "npm"
   ],
   "bin": {
-    "oki-docker": "./src/index.js"
+    "oki-docker": "./dist/index.js"
   },
   "preferGlobal": true,
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/davletovalmir/oki-docker/issues"
   },
-  "homepage": "https://github.com/davletovalmir/oki-docker#readme"
+  "homepage": "https://github.com/davletovalmir/oki-docker#readme",
+  "devDependencies": {
+    "webpack": "^4.33.0",
+    "webpack-cli": "^3.3.2"
+  }
 }

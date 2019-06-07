@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const { validateArgs } = require('./validations/args-validation');
 const { validateConfig } = require('./validations/config-validation');
 
