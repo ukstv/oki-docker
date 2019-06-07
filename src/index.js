@@ -53,9 +53,8 @@ const run = () => {
     process.exit(0);
   }
 
-  // For non-master package
+  // For non-master package, wait master package to unblock
   if (masterPackage && currentPackage !== masterPackage) {
-    // Wait master package to unblock
     watchBlockFile(projectRoot);
     return;
   }
