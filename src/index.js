@@ -22,6 +22,16 @@ const buildArgs = (args) => {
   };
 }
 
+const fastCheckIsClear = (enrichedCommands) => {
+  try {
+    // Try to run checks to speed up exec time
+    const commandsToPerform = performChecks(enrichedCommands);
+    return commandsToPerform.length === 0;
+  } catch(e) {
+    return false;
+  }
+}
+
 const run = () => {
   /* Throws error if args or config are not valid */
   validateArgs(process.argv);
@@ -35,10 +45,17 @@ const run = () => {
   validateConfig(args.configPath);
 
   const config = { ...defaultConfig, ...JSON.parse(readFile(args.configPath)) };
-  const { masterPackage, packageNameKey, projectRoot } = config;
+  const { commands, masterPackage, packageNameKey, projectRoot } = config;
   const currentPackage = process.env[packageNameKey];
+  const enrichedCommands = enrichCommands(projectRoot, commands);
 
+  if (fastCheckIsClear(enrichedCommands)) {
+    process.exit(0);
+  }
+
+  // For non-master package
   if (masterPackage && currentPackage !== masterPackage) {
+    // Wait master package to unblock
     watchBlockFile(projectRoot);
     return;
   }
@@ -46,21 +63,15 @@ const run = () => {
   addMissingTmpDir(projectRoot);
   masterPackage && blockContainers(projectRoot);
 
-  const { commands } = config;
-  const enrichedCommands = enrichCommands(projectRoot, commands);
-
   addMissingTmpFiles(projectRoot, enrichedCommands);
   logNewline();
 
   const commandsToPerform = performChecks(enrichedCommands);
-  if (commandsToPerform.length === 0) {
-    logMsg('Everything is up to date!');
-    masterPackage && unblockContainers(projectRoot);
-    return;
+  if (commandsToPerform.length > 0) {
+    performCommands(commandsToPerform);
   }
 
-  performCommands(commandsToPerform);
-
+  logMsg('Everything is up to date!');
   masterPackage && unblockContainers(projectRoot);
 };
 
