@@ -13,14 +13,30 @@ const { logMsg, logNewline } = require('./services/log-service');
 
 const defaultConfig = require('./default-config');
 
+const buildArgs = (args) => {
+  const arg = args[0];
+  const installedCheck = arg === '--installed';
+  const configPath = !installedCheck && arg;
+
+  return {
+    installedCheck,
+    configPath,
+  };
+}
+
 const run = () => {
   /* Throws error if args or config are not valid */
   validateArgs(process.argv);
 
-  const configPath = process.argv[2];
-  validateConfig(configPath);
+  const args = buildArgs(process.argv.slice(2));
+  if (args.installedCheck) {
+    console.log('true');
+    process.exit(0);
+  }
 
-  const config = { ...defaultConfig, ...JSON.parse(readFile(configPath)) };
+  validateConfig(args.configPath);
+
+  const config = { ...defaultConfig, ...JSON.parse(readFile(args.configPath)) };
   const { masterPackage, packageNameKey, projectRoot } = config;
   const currentPackage = process.env[packageNameKey];
 
