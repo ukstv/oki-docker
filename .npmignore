@@ -89,6 +89,10 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+package-lock.json
+webpack.config.js
+test/
+src/
 tmp/
 
 TODO.txt
