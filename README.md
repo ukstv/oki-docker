@@ -14,7 +14,7 @@ If you do not develop your nodejs projects with Docker Compose - you don't need 
 ### Why do I need this?
 
 Well, I assume you use Docker Compose in development. Then you might face the next issues:
-1. If your `package.json` was changed, you need to rebuild all affected Docker Compose services (or if you use `lerna` - all services), and it takes huge amount of time.
+1. If your `package.json` was changed, you need to rebuild all affected Docker Compose services (or if you use `lerna` - I bet almost all services), and it takes huge amount of time.
 2. IDE does not help you with auto-completion anymore, because `node_modules` folder is missing.
 
 **Oki Docker** suggest you to solve both issues at once by installing packages at Docker Entrypoint.
@@ -29,39 +29,58 @@ Well, I assume you use Docker Compose in development. Then you might face the ne
 
 ### Examples
 
-This example will run `yarn install`, if any `package.json` (root or service-related) will change, or root `node_modules` folder will be missing / empty.
-Also, it will run `yarn build` in context of `service2`, if `packages/service2/src/schema.graphql` will change.
+Let's say you have a monorepo with a few packages, managed by `lerna`. `common-lib` holds some reusable code, `graphql` depends on `common-lib`, `web` depends on `common-lib` and `graphql`.
+
+In this example, `oki-docker` will run `lerna bootstrap`, if any `package.json` (in root or package dir) will change, or root `node_modules` folder will be missing / empty.
+
+Also, it will run `yarn build` in `graphql` dir, if `packages/graphql/src/schema.graphql` will change.
+
+Note, that by saying **_run_** I mean **run in container's entrypoint**, and only in master package's container. Other containers will wait until master package finishes running passed commands.
 
 **docker-compose.yml**
 
 ```yaml
 version: '3.7'
 
-x-shared-volumes:
-  - &root_node_modules ./node_modules:/app/node_modules:cached
-  - &service1_dir ./packages/service1:/app/packages/service1:cached
-  - &service1_dir ./packages/service2:/app/packages/service2:cached
-  - &service3_dir ./packages/service3:/app/packages/service3:cached
+x-shared-volumes: &shared-volumes
+  - &root-node-modules ./node_modules:/app/node_modules:cached
+
+  - &common-lib ./packages/common-lib:/app/packages/common-lib:cached
+  - &graphql ./packages/graphql:/app/packages/graphql:cached
+  - &web ./packages/web:/app/packages/web:cached
+
   - &tmp ./tmp:/app/tmp:cached
     
 services:
-  service1:
+  common-lib:
     ...
-    entrypoint: ["/app/entrypoint-dev.sh"]
-    environment:
-      - OKI_PACKAGE_NAME=service1
+    volumes:
+      - *common-lib
+      - *root-node-modules
+      - *tmp
+      - ./custom-dir:/app/custom-dir
 
-  service2:
-    ...
     entrypoint: ["/app/entrypoint-dev.sh"]
     environment:
-      - OKI_PACKAGE_NAME=service2
+      - OKI_PACKAGE_NAME=common-lib
 
-  service3:
+  graphql:
     ...
+    volumes:
+      - *graphql
+      - *common-lib
+      - *root-node-modules
+      - *tmp
     entrypoint: ["/app/entrypoint-dev.sh"]
     environment:
-      - OKI_PACKAGE_NAME=service3
+      - OKI_PACKAGE_NAME=graphql
+
+  web:
+    ...
+    volumes: *shared-volumes
+    entrypoint: ["/app/entrypoint-dev.sh"]
+    environment:
+      - OKI_PACKAGE_NAME=web
 ```
 
 **oki.config.json**
@@ -70,23 +89,23 @@ services:
 {
   "projectRoot": "/app",
   "tmpPath": "/app/tmp",
-  "masterPackage": "service1",
+  "masterPackage": "common-lib",
   "commands": [
     {
-      "command": "yarn install",
+      "command": "lerna bootstrap",
       "checkRootNodeModules": true,
       "checkRootPackageJson": true,
       "packages": [
-        "packages/service1",
-        "packages/service2",
-        "packages/service3"
+        "packages/common-lib",
+        "packages/graphql",
+        "packages/web"
       ]
     },
     {
-      "command": "cd /app/packages/service2 && yarn build && cd -",
+      "command": "cd /app/packages/graphql && yarn build && cd -",
       "checks": [
         {
-          "path": "packages/service2/src/schema.graphql",
+          "path": "packages/graphql/src/schema.graphql",
           "trigger": "diff"
         }
       ]
@@ -100,6 +119,10 @@ services:
 ```bash
 #!/usr/bin/env bash
 
+set -e
+
 oki-docker /app/oki.config.json
 ...
+
+exec "$@"
 ```
