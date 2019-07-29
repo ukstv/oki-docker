@@ -23,8 +23,14 @@ const performCommands = (commandsToPerform) => {
 
     logMsg(`Running ${command}, because:\n${performReason}\n`);
     try {
-      const commandOutput = execSync(command, { encoding: 'utf8' });
-      logStdout(commandOutput);
+      execSync(command, {
+        encoding: 'utf8',
+        stdio: [
+              'pipe',
+              'pipe',
+              'pipe'
+        ]
+      });
     } catch (error) {
       logMsg(`Failed to run ${command}`);
       throw error;
